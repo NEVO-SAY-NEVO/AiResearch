@@ -8,6 +8,7 @@ import { Snackbar } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import { AlertState } from '@/components/utils/misc';
 import Logo from '@/components/global/Logo';
+import signUp from "@/firebase/auth/signup";
 // import signUp from "@/firebase/auth/signup";
 // import addData from "@/firebase/firestore/addData";
 export default function signup() {
@@ -100,37 +101,36 @@ export default function signup() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (emailRegex.test(email)) {
-            //   await signUp(email, password)
-            //     .then((result) => {        
-            //       const userData = {
-            //         firstName: firstName,
-            //         lastName: lastName,
-            //         email: email
-            //       }
-            //       router.push('/login');
-
-            //       // addData('users', 'user-id', userData)
-            //       //   .then((result) => {
-            //       //     console.log(result)
-
-            //       //   })
-            //       //   .catch((error) => {
-            //       //     console.log(error);
-            //       //   });
-            //     })
-            //     .catch((err) => {
-            //       console.log(err)
-            //     })
-            console.log('dskfljas');
-
-        } else {
+            await signUp(email, password)
+              .then((result) => {        
+                const userData = {
+                  firstName: firstName,
+                  lastName: lastName,
+                  email: email
+                }
+                router.push('/login');
+      
+                // addData('users', 'user-id', userData)
+                //   .then((result) => {
+                //     console.log(result)
+                    
+                //   })
+                //   .catch((error) => {
+                //     console.log(error);
+                //   });
+              })
+              .catch((err) => {
+                console.log(err)
+              })
+      
+          } else {
             setAlertState({
-                open: true,
-                message: 'Please input the valid email',
-                severity: 'error',
+              open: true,
+              message: 'Please input the valid email',
+              severity: 'error',
             })
             return;
-        }
+          }
     }
 
     return (

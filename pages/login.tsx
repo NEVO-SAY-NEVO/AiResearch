@@ -7,7 +7,7 @@ import { Snackbar } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import { AlertState } from '@/components/utils/misc';
 import Logo from '@/components/global/Logo';
-
+import signIn from "@/firebase/auth/signin";
 // import signIn from "@/firebase/auth/signin";
 
 export default function login() {
@@ -53,31 +53,31 @@ export default function login() {
 
         if (emailRegex.test(email)) {
             // email is valid, so redirect to new page
-            //   const { result, error } = await signIn(email, password);
-
-            //   if (error) {
-            //     setAlertState({
-            //       open: true,
-            //       message: 'Please input the correct Email or Password!',
-            //       severity: 'error',
-            //     })
-            //     return console.log(error)
-            //   }
-
-            //   // else successful
-            //   console.log(result)
+            const { result, error } = await signIn(email, password);
+      
+            if (error) {
+              setAlertState({
+                open: true,
+                message: 'Please input the correct Email or Password!',
+                severity: 'error',
+              })
+              return console.log(error)
+            }
+      
+            // else successful
+            console.log(result)
             router.push('/');
-        } else {
+          } else {
             // email is invalid, so display an error message
             // alert("Please enter a valid email address.");
             setIsNotValid(true);
             setAlertState({
-                open: true,
-                message: 'Please input the valid email',
-                severity: 'error',
+              open: true,
+              message: 'Please input the valid email',
+              severity: 'error',
             })
             return;
-        }
+          }
     }
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
