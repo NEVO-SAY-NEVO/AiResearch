@@ -8,6 +8,7 @@ export default async function signIn(email, password) {
         error = null;
     try {
         result = await signInWithEmailAndPassword(auth, email, password);
+        console.log(result, 'RESULT SIGNIN');
     } catch (e) {
         error = e;
     }

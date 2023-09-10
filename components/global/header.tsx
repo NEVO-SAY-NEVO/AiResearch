@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react'
 import Image from 'next/image'
 import { Fragment } from 'react'
 import Link from 'next/link'
@@ -8,6 +9,12 @@ import { arrayToTree, classNames, getLinkProps, useOnce } from "../../utils/misc
 import { FaLayerGroup, FaTimes, FaSearch, FaSearchengin, FaBlog, FaMicroblog, FaNewspaper, FaNapster, FaGofore, FaQuestion, FaPhoneAlt, FaLocationArrow, FaChessKing } from 'react-icons/fa';
 import Menu from './Menu';
 import Logo from './Logo';
+import { AuthContext } from '@/context/AuthContext';
+import { useRouter } from 'next/router';
+import { Snackbar } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
+import { AlertState } from '@/components/utils/misc';
+
 const themeColors = {
     blue: {
         mobileMenu: {
@@ -22,7 +29,7 @@ const themeColors = {
         },
         desktopMenu: {
             item: {
-                normal: "text-white hover:scale-105",
+                normal: "text-[#ddd] hover:text-white",
                 active: "text-[black]",
             },
         },
@@ -34,10 +41,32 @@ const themeColors = {
         },
     },
 };
+
+
 const DesktopMenu = () => {
     // const theme = useContext(ThemeContext)
+    const router = useRouter();
+    const [alertState, setAlertState] = React.useState<AlertState>({
+        open: false,
+        message: '',
+        severity: undefined,
+    })
     const buttonClass = "p-2 text-xl font-semibold font-header transition-colors cursor-pointer";
     const [show, setShow] = useState(false);
+    const { user, logOut } = React.useContext(AuthContext);
+    const handleGoSign = () => {
+        logOut();
+        router.push('/login');
+    }
+    useEffect(() => {
+        if (!show) {
+            setAlertState({
+                open: true,
+                message: 'Logged Out!',
+                severity: 'info',
+            })
+        }
+    }, [show])
     return (
         <Popover.Group className="max-xl:hidden flex items-center space-x-5 sm:space-x-10 ">
             <div className="flex space-x-0 sm:space-x-6 z-10">
@@ -51,7 +80,7 @@ const DesktopMenu = () => {
                     Model
                 </Link>
                 <Link
-                    href=""
+                    href="/price"
                     className={classNames(
                         buttonClass,
                         themeColors["blue"].desktopMenu.item["normal"]
@@ -68,19 +97,52 @@ const DesktopMenu = () => {
                 >
                     Sell
                 </Link>
-                <div
-                    className={classNames(
-                        buttonClass,
-                        themeColors["blue"].desktopMenu.item["normal"],
-                        'relative'
-                    )}
-                    onClick={() => setShow(!show)}
+                {user ?
+                    (
+                        // <div className={classNames(
+                        //     buttonClass,
+                        //     themeColors["blue"].desktopMenu.item["normal"],
+                        //     'relative'
+                        // )}
+                        //     onClick={handleSignOut}
+                        // >
+                        //     Log Out
+                        // </div>
+                        <div className={classNames(
+                            buttonClass,
+                            themeColors["blue"].desktopMenu.item["normal"],
+                            'relative'
+                        )}
+                            onClick={() => setShow(!show)}
+                        >
+                            {user.displayName ? user.displayName : 'Logged'}
+                            <Menu buttonClicked={show} />
+                        </div>
+                    )
+                    : (
+                        <div className={classNames(
+                            buttonClass,
+                            themeColors["blue"].desktopMenu.item["normal"],
+                            'relative'
+                        )} onClick={handleGoSign}
+                        >
+                            Sign In
+                        </div>
+                    )
+                }
+                <Snackbar
+                    open={alertState.open}
+                    autoHideDuration={6000}
+                    onClose={() => setAlertState({ ...alertState, open: false })}
                 >
-                    Sign In
-                    <Menu buttonClicked={show} />
-                </div>
-                <div className="flex space-x-2">
-                </div>
+                    <Alert
+                        onClose={() => setAlertState({ ...alertState, open: false })}
+                        severity={alertState.severity}
+                        className='text-[red]'
+                    >
+                        {alertState.message}
+                    </Alert>
+                </Snackbar>
             </div>
         </Popover.Group>
     );
@@ -349,6 +411,7 @@ export default function Header() {
                     <div>Contact</div>
                 </Link>
             </div>
+
         </div>
     )
 }

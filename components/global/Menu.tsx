@@ -1,12 +1,30 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FaArrowRight, FaCertificate, FaChevronRight, FaEye, FaUserCog, FaUserEdit } from 'react-icons/fa'
+import { AuthContext } from '@/context/AuthContext'
+import { Snackbar } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
+import { AlertState } from '@/components/utils/misc';
 
 interface Props {
     buttonClicked: boolean;
 }
 const Menu: React.FC<Props> = ({ buttonClicked }) => {
+    const { user, logOut } = React.useContext(AuthContext);
+    const [alertState, setAlertState] = React.useState<AlertState>({
+        open: false,
+        message: '',
+        severity: undefined,
+    })
+    const handleSignOut = () => {
+        try {
+            logOut();
+            console.log(user);
+        } catch (err) {
+            console.log(err);
+        }
+    }
     const [show, setShow] = React.useState(false);
     React.useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -17,14 +35,14 @@ const Menu: React.FC<Props> = ({ buttonClicked }) => {
                 setShow(false);
             }
         }
-    
+
         document.addEventListener('mousedown', handleClickOutside);
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-    React.useEffect(()=>{
+    React.useEffect(() => {
         buttonClicked && setShow(true);
     }, [buttonClicked])
     return (
@@ -47,7 +65,7 @@ const Menu: React.FC<Props> = ({ buttonClicked }) => {
             </div>
             <div className='mt-2 pt-2 border-t-2 border-t-dark-grey'>
                 <div className='flex items-center'>
-                    <FaEye className='mr-2 text-custom-orange'/>
+                    <FaEye className='mr-2 text-custom-orange' />
                     <div>Reviewed Records</div>
                 </div>
                 <div className='flex items-center'>
@@ -60,11 +78,24 @@ const Menu: React.FC<Props> = ({ buttonClicked }) => {
                 </div>
             </div>
             <div className='w-full flex items-center justify-center mt-4'>
-                <div className='flex items-center'>
+                <div className='flex items-center' onClick={handleSignOut}>
                     <div>Log out</div>
                     <FaArrowRight />
                 </div>
             </div>
+            <Snackbar
+                open={alertState.open}
+                autoHideDuration={6000}
+                onClose={() => setAlertState({ ...alertState, open: false })}
+            >
+                <Alert
+                    onClose={() => setAlertState({ ...alertState, open: false })}
+                    severity={alertState.severity}
+                    className='text-[red]'
+                >
+                    {alertState.message}
+                </Alert>
+            </Snackbar>
         </div>
     )
 }

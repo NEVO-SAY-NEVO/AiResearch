@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from "next/router";
@@ -9,9 +9,27 @@ import Alert from '@material-ui/lab/Alert'
 import { AlertState } from '@/components/utils/misc';
 import Logo from '@/components/global/Logo';
 import signUp from "@/firebase/auth/signup";
+import { AuthContext } from "@/context/AuthContext";
 // import signUp from "@/firebase/auth/signup";
 // import addData from "@/firebase/firestore/addData";
 export default function signup() {
+    const router = useRouter();
+    const { googleSignIn, user } = useContext(AuthContext);
+    const handleGoogleSignIn = async () => {
+        try {
+            googleSignIn();
+        } catch (error) {
+            console.log(error);
+        }
+        console.log(user, 'user user user')
+    }
+    useEffect(() => {
+        console.log(user);
+        if(user != null) {
+            console.log(user, '>>>><<<<<');
+            router.push("/")
+        }
+    }, [user])
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isNotValid, setIsNotValid] = useState<boolean>(false);
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -33,7 +51,7 @@ export default function signup() {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [password, setPassword] = useState<string>("");
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const router = useRouter();
+
 
     const handleFirstChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFirstName(e.target.value);
@@ -102,42 +120,42 @@ export default function signup() {
 
         if (emailRegex.test(email)) {
             await signUp(email, password)
-              .then((result) => {        
-                const userData = {
-                  firstName: firstName,
-                  lastName: lastName,
-                  email: email
-                }
-                router.push('/login');
-      
-                // addData('users', 'user-id', userData)
-                //   .then((result) => {
-                //     console.log(result)
-                    
-                //   })
-                //   .catch((error) => {
-                //     console.log(error);
-                //   });
-              })
-              .catch((err) => {
-                console.log(err)
-              })
-      
-          } else {
+                .then((result) => {
+                    const userData = {
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email
+                    }
+                    router.push('/login');
+
+                    // addData('users', 'user-id', userData)
+                    //   .then((result) => {
+                    //     console.log(result)
+
+                    //   })
+                    //   .catch((error) => {
+                    //     console.log(error);
+                    //   });
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+
+        } else {
             setAlertState({
-              open: true,
-              message: 'Please input the valid email',
-              severity: 'error',
+                open: true,
+                message: 'Please input the valid email',
+                severity: 'error',
             })
             return;
-          }
+        }
     }
 
     return (
         <div className=' font-header overflow-visible relative min-w-screen min-h-screen text-[#ccc] flex flex-col py-6 items-center justify-center'>
             <img className='absolute top-0 left-0 h-full w-full' src='/bg6.jpg' />
             <div className='absolute top-0 left-0 h-full w-full bg-[#000000a1] z-[5]'></div>
-            <Logo clasLog={true}/>
+            <Logo clasLog={true} />
             <div className=' bg-gradient-to-b from-[#316a99ad] to-[#350429a4] rounded-lg  shadow-auth-box py-12 px-6 z-10'>
                 <div className='text-3xl text-white font-semibold font-mono text-center pb-8'>Create a new account</div>
                 <div className='flex items-center mb-4'>
@@ -170,7 +188,8 @@ export default function signup() {
                     <label htmlFor="disabled-checked-checkbox" className="ml-2 text-sm text-slight-text dark:text-gray-500">I agree to the Swush <Link href="/privacy" className='font-medium text-white'>Privacy policy</Link></label>
                 </div>
                 <button className='flex items-center justify-center border hover:text-white rounded-lg w-full mt-7 py-3 font-bold' onClick={sign}>Join Now  &nbsp;<FaChevronRight className='text-xs' /></button>
-                <button className='flex items-center justify-center border hover:text-white rounded-lg w-full mt-3 py-3 font-bold'><svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px" viewBox="0 0 48 48" enable-background="new 0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" className='mr-2'><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg> <span>Join With Google</span> &nbsp;&nbsp;<FaChevronRight className='text-xs' /></button>
+                <button className='flex items-center justify-center border hover:text-white rounded-lg w-full mt-3 py-3 font-bold' onClick={handleGoogleSignIn}>
+                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px" viewBox="0 0 48 48" enable-background="new 0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" className='mr-2'><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg> <span>Join With Google</span> &nbsp;&nbsp;<FaChevronRight className='text-xs' /></button>
                 <div className='w-full text-center mt-4'>Already have an account? <Link href='/login' className='font-bold hover:text-white'>Log In</Link></div>
             </div>
             <Snackbar
